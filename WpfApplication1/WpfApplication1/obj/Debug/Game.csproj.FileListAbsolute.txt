@@ -1,0 +1,15 @@
+C:\Programing\WpfApplication1\Game\bin\Debug\Game.exe.config
+C:\Programing\WpfApplication1\Game\bin\Debug\Game.exe
+C:\Programing\WpfApplication1\Game\bin\Debug\Game.pdb
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.csprojAssemblyReference.cache
+C:\Programing\WpfApplication1\Game\obj\Debug\MainWindow.g.cs
+C:\Programing\WpfApplication1\Game\obj\Debug\App.g.cs
+C:\Programing\WpfApplication1\Game\obj\Debug\Game_MarkupCompile.cache
+C:\Programing\WpfApplication1\Game\obj\Debug\Game_MarkupCompile.lref
+C:\Programing\WpfApplication1\Game\obj\Debug\MainWindow.baml
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.g.resources
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.Properties.Resources.resources
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.csproj.GenerateResource.cache
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.csproj.CoreCompileInputs.cache
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.exe
+C:\Programing\WpfApplication1\Game\obj\Debug\Game.pdb
