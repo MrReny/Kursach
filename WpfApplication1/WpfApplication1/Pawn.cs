@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Text.RegularExpressions;
 
 namespace WpfApplication1
 {
@@ -50,7 +51,7 @@ namespace WpfApplication1
         private double _w = 1;
         private double _h = 1;
 
-        public Rectangle PawnSprite;
+        public Shape PawnSprite;
 
         private Canvas _parent;
 
@@ -92,12 +93,20 @@ namespace WpfApplication1
 
         public PawnMove(string name) : base(name)
         {
-            _initSprite();
+            Regex reg = new Regex(@"Bullet(\d)*");
+            MatchCollection matches = reg.Matches(name);
+            if (matches.Count > 0) _initBulletSprite();
+            else _initSprite();            
         }
 
         public PawnMove(string name, double x, double y) : this(name)
         {
             _initCoords(x, y);
+        }
+        public PawnMove(string name, double x, double y, double w, double h) : this(name, x, y)
+        {
+            InitSize(w, h);
+            
         }
         public PawnMove(ref Canvas canvas, string name, double x, double y, double w, double h):this(name,x,y)
         {
@@ -119,6 +128,13 @@ namespace WpfApplication1
         {
             PawnSprite = new Rectangle(){Width = _w, Height = _h};
             PawnSprite.Stroke = Brushes.Black;
+        }
+
+        private void _initBulletSprite()
+        {
+            PawnSprite = new Ellipse() { Width = 5, Height = 5 };
+            PawnSprite.Stroke = Brushes.Black;
+            PawnSprite.Fill = Brushes.Red;
         }
     
 
@@ -196,12 +212,16 @@ namespace WpfApplication1
                 }
             }
         }
+        public delegate void MethodContainer();
+
+        public event MethodContainer onGameOver;
 
         public virtual void SelfDestruct()
         {
             CurrentHorde = null;
             //temporary blank TODO: finish game
-            UIHelper.GetAncestor<MainWindow>(_parent).GameOver();
+            onGameOver();
+            //UIHelper.GetAncestor<MainWindow>(_parent).GameOver();
         }
 
 
@@ -213,7 +233,7 @@ namespace WpfApplication1
         private PawnMove _parent;
         public static int C { get; } = _c;
 
-        public Bullet(PawnMove p):base( p.X+p.W/2, p.Y)
+        public Bullet(PawnMove p):base( "Bullet"+1,p.X+p.W/2 - 2.5, p.Y - 3, 5, 5)
         {
             _parent = p;
             _c++;
@@ -221,7 +241,7 @@ namespace WpfApplication1
 
         public void BulletMove()
         {
-            Move(y: -1);
+            Move(y: -5);
             FindCollisions(_parent.CurrentHorde);
             if (Y <= 0)
             {
@@ -251,6 +271,7 @@ namespace WpfApplication1
             _parent = canvas;
             _parent.Children.Add(this.PawnSprite);
             _mWindow = UIHelper.GetAncestor<MainWindow>(_parent);
+            this.onLevelComplete += _mWindow.LevelComplete;
             _pHorde = horde;
             ECount++;
             CeCount++;
@@ -289,6 +310,9 @@ namespace WpfApplication1
                 player.SelfDestruct();
             }
         }
+        public delegate void LvlCompleteContainer();
+
+        public event LvlCompleteContainer onLevelComplete;
 
         public override void SelfDestruct()
         {
@@ -297,8 +321,31 @@ namespace WpfApplication1
             Scores += 1 + 1 * _mWindow.DifficultyLevel;
             DeCount++;
             _mWindow.KillCount(DeCount, Scores);
-            if (_pHorde.Count==0)  _mWindow.LevelComplete();
+            if (_pHorde.Count == 0) onLevelComplete();//_mWindow.LevelComplete();
         }
+    }
+
+    public class HardEnemy: Enemy
+    {
+        private int _health;
+        public HardEnemy(ref Canvas canvas, ref List<Enemy> horde, double x, double y) : base(ref canvas, ref horde,x, y)
+        {
+            _health = 2;
+            _reShape(Brushes.Navy);
+        }
+
+        public override void SelfDestruct()
+        {
+            _health--;
+            Scores++;
+            if(_health==0) base.SelfDestruct();
+            _reShape(Brushes.Red);
+        }
+        
+        private void _reShape(Brush b)
+        {
+            this.PawnSprite.Fill = b;
+        } 
     }
 
     public class EnemyHorde
@@ -326,7 +373,8 @@ namespace WpfApplication1
             {
                 for (int j = 0; j <= wCount; j++)
                 {
-                    Horde.Add(new Enemy(ref _parent,ref Horde,30 + 40*j,10 + 40*i));
+                    if((j+i)%2==0) Horde.Add(new Enemy(ref _parent,ref Horde,30 + 40*j,10 + 40*i));
+                    else Horde.Add(new HardEnemy(ref _parent, ref Horde, 30 + 40 * j, 10 + 40 * i));
                 }
             }
         }
