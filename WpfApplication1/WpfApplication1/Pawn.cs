@@ -93,10 +93,7 @@ namespace WpfApplication1
 
         public PawnMove(string name) : base(name)
         {
-            Regex reg = new Regex(@"Bullet(\d)*");
-            MatchCollection matches = reg.Matches(name);
-            if (matches.Count > 0) _initBulletSprite();
-            else _initSprite();            
+            _initSprite();            
         }
 
         public PawnMove(string name, double x, double y) : this(name)
@@ -129,14 +126,6 @@ namespace WpfApplication1
             PawnSprite = new Rectangle(){Width = _w, Height = _h};
             PawnSprite.Stroke = Brushes.Black;
         }
-
-        private void _initBulletSprite()
-        {
-            PawnSprite = new Ellipse() { Width = 5, Height = 5 };
-            PawnSprite.Stroke = Brushes.Black;
-            PawnSprite.Fill = Brushes.Red;
-        }
-    
 
         public void InitSize(double w, double h)
         {    // TODO: Find out better solution for resizing 
@@ -237,6 +226,14 @@ namespace WpfApplication1
         {
             _parent = p;
             _c++;
+            _initBulletSprite();
+        }
+        
+        private void _initBulletSprite()
+        {
+            PawnSprite = new Ellipse() { Width = 5, Height = 5 };
+            PawnSprite.Stroke = Brushes.Black;
+            PawnSprite.Fill = Brushes.Red;
         }
 
         public void BulletMove()
@@ -271,7 +268,7 @@ namespace WpfApplication1
             _parent = canvas;
             _parent.Children.Add(this.PawnSprite);
             _mWindow = UIHelper.GetAncestor<MainWindow>(_parent);
-            this.onLevelComplete += _mWindow.LevelComplete;
+            OnLevelComplete += _mWindow.LevelComplete;
             _pHorde = horde;
             ECount++;
             CeCount++;
@@ -312,7 +309,7 @@ namespace WpfApplication1
         }
         public delegate void LvlCompleteContainer();
 
-        public event LvlCompleteContainer onLevelComplete;
+        public event LvlCompleteContainer OnLevelComplete;
 
         public override void SelfDestruct()
         {
@@ -321,7 +318,7 @@ namespace WpfApplication1
             Scores += 1 + 1 * _mWindow.DifficultyLevel;
             DeCount++;
             _mWindow.KillCount(DeCount, Scores);
-            if (_pHorde.Count == 0) onLevelComplete();//_mWindow.LevelComplete();
+            if (_pHorde.Count == 0) OnLevelComplete();//_mWindow.LevelComplete();
         }
     }
 
