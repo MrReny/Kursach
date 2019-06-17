@@ -242,6 +242,7 @@ namespace WpfApplication1
             {    
                 if (_isGameOver||_isLevelFinished) Canvas1.Children.Clear();
                 Pawn = new PawnMove(ref Canvas1,"MainCube",LayoutMain.ActualWidth/2, LayoutMain.ActualHeight/2,10,10);
+                Pawn.onGameOver += GameOver;
                 Canvas1.Children.Add(Pawn.PawnSprite);
                 Canvas1.Focus();
                 ChangeScreens();
