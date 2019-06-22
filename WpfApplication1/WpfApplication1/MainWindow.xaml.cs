@@ -39,7 +39,7 @@ namespace WpfApplication1
         
         public List<String[]> ScoresList= new List<String[]>();
         
-        public PawnMove Pawn;
+        public Player Pawn;
 
         public EnemyHorde Horde;
 
@@ -241,8 +241,8 @@ namespace WpfApplication1
             else
             {    
                 if (_isGameOver||_isLevelFinished) Canvas1.Children.Clear();
-                Pawn = new PawnMove(ref Canvas1,"MainCube",LayoutMain.ActualWidth/2, LayoutMain.ActualHeight/2,10,10);
-                Pawn.onGameOver += GameOver;
+                Pawn = new Player(ref Canvas1,"MainCube",LayoutMain.ActualWidth/2, LayoutMain.ActualHeight/2,10,10);
+                Pawn.OnGameOver += GameOver;
                 Canvas1.Children.Add(Pawn.PawnSprite);
                 Canvas1.Focus();
                 ChangeScreens();

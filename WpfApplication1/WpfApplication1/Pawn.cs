@@ -50,15 +50,11 @@ namespace WpfApplication1
 
         private double _w = 1;
         private double _h = 1;
+        
+        protected Canvas Parent;
 
         public Shape PawnSprite;
 
-        private Canvas _parent;
-
-        public List<Bullet> Bullets = new List<Bullet>();
-
-        public List<Enemy> CurrentHorde;
-        
         public double W
         {
             get { return _w; }
@@ -108,7 +104,7 @@ namespace WpfApplication1
         public PawnMove(ref Canvas canvas, string name, double x, double y, double w, double h):this(name,x,y)
         {
             InitSize(w,h);
-            _parent = canvas;
+            Parent = canvas;
         }
 
         private void _initCoords(double x, double y)
@@ -155,36 +151,7 @@ namespace WpfApplication1
             Relocate();
         }
 
-        public void SMove(double x = 0, double y = 0)
-        {
-            Move(x,y);
-            FindCollisions(CurrentHorde);
-        }
-
-        public void FireBullet(ref Canvas canvas)
-        {
-            Bullet b = new Bullet(this);
-            Bullets.Add(b);
-            canvas.Children.Add(b.PawnSprite);
-            if (_parent==null) _parent = canvas;
-        }
-
-        public void DestroyBullet(Bullet bullet)
-        {
-            Bullets.Remove(bullet);
-            _parent.Children.Remove(bullet.PawnSprite);
-        }
-
-        public void MoveBullets()
-        {
-           if (Bullets.Count > 0)
-            {
-                for (var i = 0; i <= Bullets.Count-1; i++)
-                {
-                    Bullets[i].BulletMove();
-                }
-            }
-        }
+        
         public virtual void FindCollisions(List<Enemy> horde)
         {    
             
@@ -201,28 +168,76 @@ namespace WpfApplication1
                 }
             }
         }
-        public delegate void MethodContainer();
-
-        public event MethodContainer onGameOver;
-
+        
         public virtual void SelfDestruct()
         {
-            CurrentHorde = null;
-            //temporary blank TODO: finish game
-            onGameOver();
-            //UIHelper.GetAncestor<MainWindow>(_parent).GameOver();
+            return;
         }
 
 
     }
 
+    public class Player : PawnMove
+    {
+        public List<Bullet> Bullets = new List<Bullet>();
+
+        public List<Enemy> CurrentHorde;  
+        
+        public Player(ref Canvas canvas, string name, double x, double y, double w, double h):base(ref canvas,name,x,y,w,h)
+        {
+            
+        }
+        
+        public void SMove(double x = 0, double y = 0)
+        {
+            Move(x,y);
+            FindCollisions(CurrentHorde);
+        }
+
+        public void FireBullet(ref Canvas canvas)
+        {
+            Bullet b = new Bullet(this);
+            Bullets.Add(b);
+            canvas.Children.Add(b.PawnSprite);
+            if (Parent==null) Parent = canvas;
+        }
+
+        public void DestroyBullet(Bullet bullet)
+        {
+            Bullets.Remove(bullet);
+            Parent.Children.Remove(bullet.PawnSprite);
+        }
+
+        public void MoveBullets()
+        {
+            if (Bullets.Count > 0)
+            {
+                for (var i = 0; i <= Bullets.Count-1; i++)
+                {
+                    Bullets[i].BulletMove();
+                }
+            }
+        }
+        
+        public delegate void MethodContainer();
+        public event MethodContainer OnGameOver;
+        public override void SelfDestruct()
+        {
+            CurrentHorde = null;
+            //temporary blank TODO: finish game
+            OnGameOver();
+            //UIHelper.GetAncestor<MainWindow>(_parent).GameOver();
+        }
+        
+    }
+    
     public class Bullet : PawnMove
     {
         private static int _c;
-        private PawnMove _parent;
+        private Player _parent;
         public static int C { get; } = _c;
 
-        public Bullet(PawnMove p):base( "Bullet"+1,p.X+p.W/2 - 2.5, p.Y - 3, 5, 5)
+        public Bullet(Player p):base( "Bullet"+1,p.X+p.W/2 - 2.5, p.Y - 3, 5, 5)
         {
             _parent = p;
             _c++;
